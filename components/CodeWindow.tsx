@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
-import { gsap } from 'gsap';
+import React, { useRef } from 'react';
+// Removed GSAP import since we don't animate this internally anymore
 
 interface Props {
   title: string;
@@ -9,7 +9,7 @@ interface Props {
   onChange?: (val: string) => void;
   readOnly?: boolean;
   variant: "input" | "output";
-  className?: string; // Added optional className prop
+  className?: string; 
 }
 
 export default function CodeWindow({ title, code, onChange, readOnly, variant, className = "" }: Props) {
@@ -21,23 +21,13 @@ export default function CodeWindow({ title, code, onChange, readOnly, variant, c
   
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Entrance animation
-    gsap.fromTo(containerRef.current, 
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", delay: isOutput ? 0.2 : 0 }
-    );
-  }, [isOutput]);
-
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code);
-    // Simple visual feedback could be added here
   };
 
   return (
     <div 
       ref={containerRef} 
-      // Merged className prop at the end to allow overrides
       className={`relative flex flex-col bg-obsidian-light rounded-2xl border ${borderColor} ${glow} overflow-hidden transition-all duration-500 hover:border-opacity-40 group ${className}`}
     >
       {/* Mac-style Window Header */}

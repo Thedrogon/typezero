@@ -4,7 +4,7 @@ import { signIn } from "next-auth/react"; // Client-side signin
 
 export default function LoginModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -12,13 +12,13 @@ export default function LoginModal({ onClose }: { onClose: () => void }) {
       />
       
       {/* Card */}
-      <div className="relative w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-2xl p-8 shadow-2xl transform transition-all scale-100">
+      <div className="relative w-full max-w-md bg-obsidian-light border border-white/10 rounded-2xl p-8 shadow-2xl transform transition-all scale-100">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white">
           <X className="w-5 h-5" />
         </button>
 
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#D4FF00] text-black font-black text-xl mb-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-sage text-black font-black text-xl mb-4">
             T0
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">Welcome Back</h2>

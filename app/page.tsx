@@ -26,8 +26,8 @@ export default function Landing() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-sage/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
         
         <div className="mb-8 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 hero-text backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse"/>
-            <span className="text-[10px] font-mono tracking-widest text-gray-400 uppercase">v2.0 Beta Live</span>
+            <span className="w-2 h-2 rounded-full bg-sage animate-pulse"/>
+            <span className="text-[11px] font-mono tracking-widest text-gray-400 uppercase">v0.0 Beta Live</span>
         </div>
 
         <h1 className="hero-text text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-6">
@@ -56,7 +56,7 @@ export default function Landing() {
 
       {/* 3. Trusted By (Social Proof) */}
       <div className="py-12 border-y border-white/5 bg-[#030303]/50 backdrop-blur-sm">
-        <p className="text-center text-[10px] font-mono text-gray-700 tracking-[0.2em] uppercase mb-8">Powering Next-Gen Teams</p>
+        <p className="text-center text-sm font-mono text-sage tracking-[0.2em] uppercase mb-8">Powering Next-Gen Teams</p>
         <div className="flex flex-wrap justify-center gap-12 opacity-40 grayscale mix-blend-screen px-4">
              {/* Replace these spans with actual SVGs for production */}
             <span className="font-bold text-lg tracking-tight">ACME CORP</span>
