@@ -62,7 +62,7 @@ export default function BentoGrid() {
         ease: "power2.out", // Smoother, less jarring than elastic for debugging
         scrollTrigger: {
           trigger: container.current,
-          start: "top 50%", // Triggers earlier (when top of grid hits bottom 15% of screen)
+          start: "top 60%", // Triggers earlier (when top of grid hits bottom 15% of screen)
           toggleActions: "play none none reverse"
         },
       }
@@ -70,7 +70,7 @@ export default function BentoGrid() {
   }, { scope: container });
 
   return (
-    <section ref={container} className="bento-grid relative py-32 px-4 max-w-7xl mx-auto">
+    <section ref={container} className="bento-grid relative py-30 px-4 max-w-7xl mx-auto">
       
       {/* Section Header */}
       <div className="mb-20 text-center">
@@ -81,7 +81,7 @@ export default function BentoGrid() {
             Standard.
           </span>
         </h2>
-        <p className="font-mono text-sm text-gray-500 uppercase tracking-widest">
+        <p className="font-mono text-sm text-gray-400 uppercase tracking-widest">
             Built for production environments. Not demos.
         </p>
       </div>

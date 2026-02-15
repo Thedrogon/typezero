@@ -7,7 +7,7 @@ interface NavbarProps {
 
 export default function Navbar({ onLogin }: NavbarProps) {
   return (
-    <nav className="fixed top-0 z-50 w-full bg-transparent backdrop-blur-md pt-4">
+    <nav className="fixed top-0 z-50 w-full bg-transparent backdrop-blur-md pt-2">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         {/* TYPEZERO LOGO */}
         <div className="group relative inline-flex cursor-pointer items-center gap-1.5 select-none">

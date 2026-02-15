@@ -33,7 +33,7 @@ export default function Comparison() {
   }, { scope: container });
 
   return (
-    <section ref={container} className="py-32 bg-obsidian overflow-hidden">
+    <section ref={container} className="py-30 bg-obsidian overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         
         {/* Header with "Glitch" vibe */}
