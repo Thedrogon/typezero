@@ -14,8 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JSON → TS | The Modern Transformer",
-  description: "Instant JSON to TypeScript interface generator.",
+  title: {
+    default: "TypeZero // The Entropy Killer",
+    template: "%s // TypeZero"
+  },
+  description: "Stop hand-writing interfaces. The autonomous engineering agent that violently transforms raw JSON into strict, production-ready TypeScript, Zod, Pydantic and SQL.",
+  keywords: ["JSON to TypeScript", "Zod Schema Generator", "SQL DDL", "Developer Tools", "Chaos Engineering"],
+  authors: [{ name: "Shayan Mukherjee" }],
+  openGraph: {
+    title: "TypeZero // Structure from Pure Chaos",
+    description: "Don't think. Just paste. Instant, local-first type inference for the modern web.",
+    siteName: "TypeZero",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TypeZero // The Entropy Killer",
+    description: "Turn your messy JSON into strict, type-safe production code. Instantly.",
+    creator: "Shayan Mukherjee",
+  },
 };
 
 export default function RootLayout({

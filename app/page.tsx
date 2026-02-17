@@ -21,7 +21,7 @@ export default function Landing() {
 
   return (
     <div className="selection:bg-sage min-h-screen overflow-x-hidden font-sans text-white selection:text-black">
-      {/* --- LAYER 0: THE LAVA LAMP (Fixed in background) --- */}
+     
       {/* Visible only when content above it is transparent */}
       <LavaLamp />
 
@@ -67,14 +67,13 @@ export default function Landing() {
         <DemoSection />
       </div>
 
-      {/* --- LAYER 2: SOLID DARK SECTIONS (Covers Lava Lamp) --- */}
       {/* This div slides up over the fixed lamp, effectively hiding it */}
       <div className="bg-obsidian relative z-20 border-t border-white/5 shadow-[0_-50px_100px_rgba(0,0,0,1)]">
-        {/* The "Obsidian Sage Patched BG" Effect */}
+       
         {/* A subtle static glow to keep the vibe without the bouncing balls */}
         <div className="from-sage/5 via-obsidian pointer-events-none absolute left-1/2 h-200 w-full -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] to-transparent" />
 
-        {/* 3. Trusted By */}
+        
         <div className="relative py-16">
           <p className="text-sage mb-12 text-center font-mono text-sm tracking-[0.2em] uppercase">
             Powering Next-Gen Teams
