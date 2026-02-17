@@ -62,7 +62,7 @@ export default function BentoGrid() {
         ease: "power2.out", // Smoother, less jarring than elastic for debugging
         scrollTrigger: {
           trigger: container.current,
-          start: "top 60%", // Triggers earlier (when top of grid hits bottom 15% of screen)
+          start: "top 70%", // Triggers earlier (when top of grid hits bottom 15% of screen)
           toggleActions: "play none none reverse"
         },
       }

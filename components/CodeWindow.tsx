@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useRef } from 'react';
-// Removed GSAP import since we don't animate this internally anymore
+import { highlightCode } from '@/lib/highlighter';
 
 interface Props {
   title: string;
@@ -9,36 +8,33 @@ interface Props {
   onChange?: (val: string) => void;
   readOnly?: boolean;
   variant: "input" | "output";
+  mode?: "json" | "ts" | "sql" | "py"; // Added mode for highlighting
   className?: string; 
 }
 
-export default function CodeWindow({ title, code, onChange, readOnly, variant, className = "" }: Props) {
-  // Dynamic classes based on variant using Tailwind v4 variables
+export default function CodeWindow({ title, code, onChange, readOnly, variant, mode = "json", className = "" }: Props) {
   const isOutput = variant === "output";
-  const borderColor = isOutput ? "border-sage/20" : "border-white/10";
-  const glow = isOutput ? "shadow-[0_0_50px_-10px_var(--color-sage-dim)]" : "shadow-none";
+  // Toned down border and glow for "Pro" look
+  const borderColor = isOutput ? "border-sage/20" : "border-white/5"; 
   const textColor = isOutput ? "text-sage" : "text-gray-400";
   
-  const containerRef = useRef<HTMLDivElement>(null);
+  const copyToClipboard = () => navigator.clipboard.writeText(code);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(code);
-  };
+  // Generate Highlighted HTML
+  const highlightedHtml = highlightCode(code, mode);
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`relative flex flex-col bg-obsidian-light rounded-2xl border ${borderColor} ${glow} overflow-hidden transition-all duration-500 hover:border-opacity-40 group ${className}`}
-    >
-      {/* Mac-style Window Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#111] border-b border-white/5">
+    <div className={`relative flex flex-col bg-obsidian-light rounded-lg border ${borderColor} overflow-hidden group ${className}`}>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-white/5 select-none">
         <div className="flex items-center gap-3">
-          <div className="flex gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-            <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-            <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-            <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+          <div className="flex gap-1.5 opacity-40">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
           </div>
-          <span className={`ml-4 text-xs font-bold tracking-widest uppercase ${textColor} font-mono`}>
+          <span className={`ml-2 text-[10px] font-bold tracking-widest uppercase ${textColor} font-mono opacity-80`}>
             {title}
           </span>
         </div>
@@ -46,7 +42,7 @@ export default function CodeWindow({ title, code, onChange, readOnly, variant, c
         {isOutput && code && (
           <button 
             onClick={copyToClipboard}
-            className="text-[10px] font-bold tracking-widest text-gray-500 hover:text-sage transition-colors uppercase"
+            className="text-[9px] font-bold tracking-widest text-gray-600 hover:text-sage transition-colors uppercase"
           >
             Copy
           </button>
@@ -54,23 +50,29 @@ export default function CodeWindow({ title, code, onChange, readOnly, variant, c
       </div>
 
       {/* Editor Area */}
-      <div className="relative flex-1">
+      <div className="relative flex-1 overflow-hidden">
+        
+        {/* 1. Syntax Layer (Behind) */}
+        <pre 
+          className="absolute inset-0 p-6 font-mono text-sm leading-relaxed whitespace-pre-wrap wrap-break-word pointer-events-none z-0"
+          dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+          style={{ fontFamily: '"Geist Mono", monospace' }} 
+        />
+
+        {/* 2. Input Layer (Transparent Textarea) */}
         <textarea
           value={code}
           onChange={(e) => onChange && onChange(e.target.value)}
           readOnly={readOnly}
           spellCheck={false}
           className={`
-            w-full h-full bg-transparent p-6 font-mono text-sm resize-none focus:outline-none 
-            ${isOutput ? 'text-gray-300' : 'text-gray-400'}
-            placeholder:text-gray-700
-            selection:bg-sage selection:text-black
+            relative z-10 w-full h-full bg-transparent p-6 font-mono text-sm leading-relaxed resize-none focus:outline-none 
+            text-transparent caret-white selection:bg-sage/30
+            ${readOnly ? 'cursor-default' : ''}
           `}
-          placeholder={readOnly ? "// TypeScript interface will appear here..." : "// Paste your raw JSON object here..."}
+          style={{ fontFamily: '"Geist Mono", monospace' }}
+          placeholder={readOnly ? "" : "// Paste JSON..."}
         />
-        
-        {/* Subtle decorative line number imitation */}
-        <div className="absolute left-0 top-6 bottom-6 w-px bg-white/5 mx-3 pointer-events-none" />
       </div>
     </div>
   );

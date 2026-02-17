@@ -40,7 +40,7 @@ export default function Landing() {
           </div>
 
           <h1 className="hero-text text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-6">
-            Just paste <br />
+            Just paste <br/>
             <span className="text-transparent bg-clip-text bg-linear-to-r from-sage to-emerald-400">
               what you have.
             </span>
