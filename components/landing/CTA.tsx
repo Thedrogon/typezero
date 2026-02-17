@@ -78,7 +78,7 @@ export default function CTA() {
             placeholder="dev@startup.com"
             className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all"
           />
-
+           {/*TODO: Implementing mailing system*/}
           <button className="bg-sage text-black font-bold rounded-full px-6 py-4 flex items-center justify-center gap-2">
             Get Early Access
             <ArrowRight className="w-5 h-5" />
