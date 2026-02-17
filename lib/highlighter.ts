@@ -8,15 +8,19 @@ const escapeHtml = (s: string) =>
 const span = (cls: string, text: string) =>
   `<span class="${cls}">${text}</span>`;
 
-// VS Code Dark+ inspired palette (balanced for Tailwind)
+/*
+  Tuned VS Code Dark+ palette.
+  We intentionally boost contrast vs your background.
+*/
 const COLORS = {
-  key: "text-[#9cdcfe]",
+  key: "text-[#9cdcfe]",          // object keys / fields
   string: "text-[#ce9178]",
   number: "text-[#b5cea8]",
   keyword: "text-[#c586c0]",
   type: "text-[#4ec9b0]",
+  func: "text-[#dcdcaa]",
   boolean: "text-[#569cd6]",
-  decorator: "text-[#dcdcaa]"
+  punctuation: "text-[#808080]"
 };
 
 export const highlightCode = (code: string, lang: Lang): string => {
@@ -24,6 +28,7 @@ export const highlightCode = (code: string, lang: Lang): string => {
 
   let html = escapeHtml(code);
 
+  /* ---------- JSON ---------- */
   if (lang === "json") {
     return html.replace(
       /("(?:\\.|[^"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
@@ -36,25 +41,60 @@ export const highlightCode = (code: string, lang: Lang): string => {
     );
   }
 
+  /* ---------- TYPESCRIPT ---------- */
   if (lang === "ts") {
-    html = html.replace(/\b(export|interface|type)\b/g, span(COLORS.keyword, "$1"));
-    html = html.replace(/\b(string|number|boolean|null|any)\b/g, span(COLORS.keyword, "$1"));
-    html = html.replace(/(interface\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`);
-    html = html.replace(/(\w+)(:)/g, `${span(COLORS.key, "$1")}$2`);
+    html = html
+      .replace(/\b(export|interface|type|extends|readonly)\b/g, span(COLORS.keyword, "$1"))
+      .replace(/\b(string|number|boolean|null|any)\b/g, span(COLORS.keyword, "$1"))
+      .replace(/(interface\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`)
+      .replace(/(\w+)(:)/g, `${span(COLORS.key, "$1")}$2`)
+      .replace(/\b([A-Z][A-Za-z0-9_]+)\b/g, span(COLORS.type, "$1")); // types
+
     return html;
   }
 
+  /* ---------- SQL ---------- */
   if (lang === "sql") {
-    html = html.replace(
-      /\b(CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|SERIAL|NOT|NULL)\b/g,
-      span(COLORS.keyword, "$1")
-    );
+    html = html
+      .replace(
+        /\b(CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|PRECISION|SERIAL|NOT|NULL|JSONB|SELECT|FROM|WHERE)\b/gi,
+        span(COLORS.keyword, "$1")
+      )
+      .replace(/\b([a-z_][a-z0-9_]*)\b(?=\s+\()/gi, span(COLORS.func, "$1")) // functions
+      .replace(/"[^"]+"/g, span(COLORS.string, "$&"));
+
     return html;
   }
 
+  /* ---------- PYTHON / PYDANTIC ---------- */
   if (lang === "py") {
-    html = html.replace(/\b(class|from|import|List|Optional)\b/g, span(COLORS.keyword, "$1"));
-    html = html.replace(/(class\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`);
+    html = html
+      // imports / keywords
+      .replace(/\b(class|from|import|as|return|pass)\b/g, span(COLORS.keyword, "$1"))
+
+      // typing constructs
+      .replace(/\b(List|Optional|Dict|Any|Union)\b/g, span(COLORS.type, "$1"))
+
+      // BaseModel / Field / validator / etc
+      .replace(/\b(BaseModel|Field|validator)\b/g, span(COLORS.type, "$1"))
+
+      // class names
+      .replace(/(class\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`)
+
+      // function calls
+      .replace(/\b([a-z_][a-z0-9_]*)\(/gi, `${span(COLORS.func, "$1")}(`)
+
+      // field names
+      .replace(/^\s*([a-z_][a-z0-9_]*)\s*:/gim, (_, name) =>
+        `    ${span(COLORS.key, name)}:`
+      )
+
+      // strings
+      .replace(/"[^"]*"|'[^']*'/g, span(COLORS.string, "$&"))
+
+      // numbers
+      .replace(/\b\d+(\.\d+)?\b/g, span(COLORS.number, "$&"));
+
     return html;
   }
 
