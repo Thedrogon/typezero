@@ -18,65 +18,73 @@ const COLORS = {
   boolean: "text-[#569cd6]"
 };
 
-/**
- * IMPORTANT:
- * We highlight line-by-line and never re-process injected HTML.
- */
 export const highlightCode = (code: string, lang: Lang): string => {
   if (!code) return "";
-
   const lines = code.split("\n");
 
   const highlightLine = (line: string): string => {
-    let text = escapeHtml(line);
+    const text = escapeHtml(line);
 
     /* ---------- JSON ---------- */
+    // Combined regex for Keys, Strings, Booleans, Numbers
     if (lang === "json") {
       return text.replace(
-        /("(?:\\.|[^"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
-        (match, _, colon, bool) => {
-          if (colon) return span(COLORS.key, match);
-          if (bool) return span(COLORS.boolean, match);
-          if (/^-?\d/.test(match)) return span(COLORS.number, match);
-          return span(COLORS.string, match);
+        /("(?:\\.|[^"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?/g,
+        (match, str, colon, bool) => {
+          if (colon) return span(COLORS.key, match); // "key":
+          if (bool) return span(COLORS.boolean, match); // true/false
+          if (/^-?\d/.test(match)) return span(COLORS.number, match); // 123
+          return span(COLORS.string, match); // "value"
         }
       );
     }
 
-    /* ---------- TS ---------- */
+    /* ---------- TYPESCRIPT ---------- */
+    // Order: Strings -> Keywords -> Types (Capitalized) -> Keys (prop:)
     if (lang === "ts") {
-      text = text.replace(/\b(export|interface|type|extends|readonly)\b/g, span(COLORS.keyword, "$1"));
-      text = text.replace(/\b(string|number|boolean|null|any)\b/g, span(COLORS.keyword, "$1"));
-      text = text.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g, span(COLORS.type, "$1"));
-      text = text.replace(/(\w+)(:)/g, `${span(COLORS.key, "$1")}$2`);
-      return text;
+      const rx = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|(\b(?:export|interface|type|extends|readonly|string|number|boolean|null|any|void|object|return|const|let|var|function)\b)|(\b[A-Z][a-zA-Z0-9_]*\b)|(\w+\s*:)/g;
+      
+      return text.replace(rx, (match, str, keyword, type, key) => {
+        if (str) return span(COLORS.string, str);
+        if (keyword) return span(COLORS.keyword, match);
+        if (type) return span(COLORS.type, match);
+        if (key) {
+           // Color the identifier, keep the colon plain
+           return match.replace(/(\w+)(\s*:)/, (_, k, c) => `${span(COLORS.key, k)}${c}`);
+        }
+        return match;
+      });
     }
 
     /* ---------- SQL ---------- */
+    // Order: Strings/Identifiers -> Keywords -> Numbers
     if (lang === "sql") {
-      text = text.replace(
-        /\b(CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|PRECISION|SERIAL|NOT|NULL|JSONB)\b/gi,
-        span(COLORS.keyword, "$1")
-      );
+      const rx = /("[^"]*"|'[^']*')|(\b(?:CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|PRECISION|SERIAL|NOT|NULL|JSONB|BIGSERIAL|INSERT|INTO|VALUES|SELECT|FROM|WHERE|AND|OR|LIMIT|OFFSET)\b)|(\b\d+\b)/gi;
 
-      text = text.replace(/"[^"]+"/g, span(COLORS.string, "$&"));
-
-      text = text.replace(/\b\d+\b/g, span(COLORS.number, "$&"));
-
-      return text;
+      return text.replace(rx, (match, str, keyword, number) => {
+        if (str) return span(COLORS.string, str); // Identifiers like "id"
+        if (keyword) return span(COLORS.keyword, match); // Keywords
+        if (number) return span(COLORS.number, match);
+        return match;
+      });
     }
 
-    /* ---------- PYDANTIC ---------- */
+    /* ---------- PYDANTIC (PYTHON) ---------- */
+    // Order: Strings -> Keywords -> Known Types -> Capitalized Types -> Keys
     if (lang === "py") {
-      text = text.replace(/\b(class|from|import|pass)\b/g, span(COLORS.keyword, "$1"));
-      text = text.replace(/\b(BaseModel|Field|List|Optional|Any)\b/g, span(COLORS.type, "$1"));
-      text = text.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g, span(COLORS.type, "$1"));
-      text = text.replace(/^(\s*)([a-z_][a-z0-9_]*)(:)/i,
-        (_, ws, name, colon) => `${ws}${span(COLORS.key, name)}${colon}`
-      );
-      text = text.replace(/"[^"]*"|'[^']*'/g, span(COLORS.string, "$&"));
-      text = text.replace(/\b\d+\b/g, span(COLORS.number, "$&"));
-      return text;
+      const rx = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(\b(?:class|from|import|pass|def|return|if|else|elif)\b)|(\b(?:BaseModel|Field|List|Optional|Any|str|int|float|bool|None)\b)|(\b[A-Z][a-zA-Z0-9_]*\b)|(^\s*\w+\s*:)/g;
+
+      return text.replace(rx, (match, str, keyword, knownType, capType, keyPair) => {
+        if (str) return span(COLORS.string, str);
+        if (keyword) return span(COLORS.keyword, match);
+        if (knownType) return span(COLORS.type, match);
+        if (capType) return span(COLORS.type, match);
+        if (keyPair) {
+           // Handle "    name:" at start of line
+           return match.replace(/(\w+)(\s*:)/, (_, k, c) => `${span(COLORS.key, k)}${c}`);
+        }
+        return match;
+      });
     }
 
     return text;
