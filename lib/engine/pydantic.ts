@@ -8,23 +8,53 @@ type PydanticType =
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// 1. INFERENCE PHASE
-const infer = (data: any, name: string): PydanticType => {
-  if (data === null) return { type: "None" };
-  
-  if (Array.isArray(data)) {
-    if (data.length === 0) return { type: "List", item: { type: "Any" } };
-    // Check first item for type (In prod, merge all items)
-    const itemType = infer(data[0], name + "Item");
-    return { type: "List", item: itemType };
+//infering
+const merge = (a: PydanticType, b: PydanticType): PydanticType => {
+  if (a.type === "Any") return b;
+  if (b.type === "Any") return a;
+  if (a.type !== b.type) return { type: "Any" };
+
+  if (a.type === "List" && b.type === "List") {
+    return { type: "List", item: merge(a.item, b.item) };
   }
 
-  if (typeof data === "object") {
+  if (a.type === "class" && b.type === "class") {
     const fields: Record<string, PydanticType> = {};
-    Object.entries(data).forEach(([key, value]) => {
-      // Clean key for class names if needed, but keep field names raw
-      fields[key] = infer(value, capitalize(key));
-    });
+
+    const keys = new Set([...Object.keys(a.fields), ...Object.keys(b.fields)]);
+    for (const k of keys) {
+      if (a.fields[k] && b.fields[k]) {
+        fields[k] = merge(a.fields[k], b.fields[k]);
+      } else {
+        fields[k] = a.fields[k] ?? b.fields[k];
+      }
+    }
+
+    return { type: "class", name: a.name, fields };
+  }
+
+  return a;
+};
+
+const infer = (data: any, name: string): PydanticType => {
+  if (data === null) return { type: "None" };
+
+  if (Array.isArray(data)) {
+    if (!data.length) return { type: "List", item: { type: "Any" } };
+
+    let merged = infer(data[0], name + "Item");
+    for (let i = 1; i < Math.min(data.length, 50); i++) {
+      merged = merge(merged, infer(data[i], name + "Item"));
+    }
+
+    return { type: "List", item: merged };
+  }
+
+  if (typeof data === "object" && data !== null) {
+    const fields: Record<string, PydanticType> = {};
+    for (const [k, v] of Object.entries(data)) {
+      fields[k] = infer(v, capitalize(k));
+    }
     return { type: "class", name: capitalize(name), fields };
   }
 
@@ -37,7 +67,8 @@ const infer = (data: any, name: string): PydanticType => {
   return { type: "Any" };
 };
 
-// 2. GENERATION PHASE
+
+//GENERATION PHASE
 export const jsonToPydantic = (jsonStr: string, rootName: string = "Root"): string => {
   try {
     const data = JSON.parse(jsonStr);
