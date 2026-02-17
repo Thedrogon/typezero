@@ -5,6 +5,7 @@ import { generateTs } from '@/lib/engine/typescript';
 import { jsonToZod } from '@/lib/engine/zod';
 import { jsonToSql } from '@/lib/engine/sql';
 import { jsonToPydantic } from '@/lib/engine/pydantic';
+import {VERSION,VERSION_TYPE} from '@/lib/constants'
 import {
   FileType,
   Database,
@@ -19,7 +20,7 @@ import {
   Zap,
   Terminal,
   Cpu,
-  LayoutTemplate
+  LayoutTemplate,
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -34,7 +35,7 @@ const MODE_THEME: Record<
   TS: { accentClass: 'text-blue-400', icon: FileType, borderClass: 'border-blue-500/30', label: 'TypeScript' },
   ZOD: { accentClass: 'text-violet-400', icon: ShieldCheck, borderClass: 'border-violet-500/30', label: 'Zod' },
   SQL: { accentClass: 'text-orange-400', icon: Database, borderClass: 'border-orange-500/30', label: 'SQL' },
-  PYDANTIC: { accentClass: 'text-emerald-400', icon: Box, borderClass: 'border-emerald-500/30', label: 'Pydantic' }
+  PYDANTIC: { accentClass: 'text-emerald-400', icon: Box, borderClass: 'border-emerald-500/30', label: 'Pydantic' },
 };
 
 // Engine config (logic only)
@@ -42,7 +43,7 @@ const MODE_CONFIG: Record<Mode, { run: (json: string) => string; codeMode: 'ts' 
   TS: { run: generateTs, codeMode: 'ts' },
   ZOD: { run: jsonToZod, codeMode: 'ts' },
   SQL: { run: jsonToSql, codeMode: 'sql' },
-  PYDANTIC: { run: jsonToPydantic, codeMode: 'py' }
+  PYDANTIC: { run: jsonToPydantic, codeMode: 'py' },
 };
 
 // --- DATA (with stable ids) ---
@@ -50,13 +51,13 @@ const BUILD_LOG = [
   { id: 'b-01', step: '01', title: 'Core Engine', desc: 'Regex → AST Upgrade', icon: Cpu, done: true },
   { id: 'b-02', step: '02', title: 'UI Overhaul', desc: 'Obsidian / Sage theme', icon: LayoutTemplate, done: true },
   { id: 'b-03', step: '03', title: 'Inference', desc: 'Recursive types support', icon: Zap, done: true },
-  { id: 'b-04', step: '04', title: 'Pydantic', desc: 'Python support added', icon: Box, done: true }
+  { id: 'b-04', step: '04', title: 'Pydantic', desc: 'Python support added', icon: Box, done: true },
 ];
 
 const FUTURE_PLANS = [
   { id: 'f-01', title: 'CLI Tool', desc: 'npx typezero watch', icon: Terminal },
   { id: 'f-02', title: 'VS Code Ext', desc: 'Inline generation', icon: FileType },
-  { id: 'f-03', title: 'AI Repair', desc: 'Auto-fix invalid JSON', icon: Radio }
+  { id: 'f-03', title: 'AI Repair', desc: 'Auto-fix invalid JSON', icon: Radio },
 ];
 
 // --- Small helpers/hooks ---
@@ -70,7 +71,9 @@ function useDebounced<T>(value: T, delay = 500) {
 }
 
 function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' ? window.innerWidth < breakpoint : false);
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
+  );
   useEffect(() => {
     function onResize() {
       setIsMobile(window.innerWidth < breakpoint);
@@ -89,33 +92,35 @@ const DevSidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
   return (
     <aside
       aria-hidden={!isOpen}
-      className={`fixed md:relative z-40 top-0 left-0 h-full transition-all duration-300 ease-in-out
-        ${isOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0 md:w-0 overflow-hidden'}
-        bg-obsidian-light border-r border-white/5 flex flex-col`}
+      className={`fixed top-0 left-0 z-40 h-full transition-all duration-300 ease-in-out md:relative ${isOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full overflow-hidden md:w-0 md:translate-x-0'} bg-obsidian-light flex flex-col border-r border-white/5`}
     >
-      <div className="flex flex-col h-full w-72">
-        <div className="h-14 border-b border-white/6 flex items-center justify-between px-5">
-          <span className="font-mono text-[11px] font-semibold text-gray-400 uppercase tracking-wider">SYSTEM LOGS</span>
-          <button aria-label="Close sidebar" onClick={onClose} className="md:hidden text-gray-400 hover:text-white">
-            <PanelLeftClose className="w-4 h-4" />
+      <div className="flex h-full w-72 flex-col">
+        <div className="flex h-14 items-center justify-between border-b border-white/6 px-5">
+          <span className="font-mono text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
+            SYSTEM LOGS
+          </span>
+          <button aria-label="Close sidebar" onClick={onClose} className="text-gray-400 hover:text-white md:hidden">
+            <PanelLeftClose className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-8">
+        <div className="flex-1 space-y-8 overflow-y-auto p-5">
           {/* Build section */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-3">
-              <GitCommit className="w-4 h-4 text-sage" /> Build sequence
+            <h3 className="mb-4 flex items-center gap-3 text-sm font-semibold text-white">
+              <GitCommit className="text-sage h-4 w-4" /> Build sequence
             </h3>
 
-            <div className="relative border-l border-white/8 ml-1.5 pl-5 space-y-6">
+            <div className="relative ml-1.5 space-y-6 border-l border-white/8 pl-5">
               {BUILD_LOG.map((item) => (
-                <div key={item.id} className="relative group">
-                  <div className="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-[#111] border border-white/20 group-hover:border-sage group-hover:bg-sage/25 transition-colors" />
+                <div key={item.id} className="group relative">
+                  <div className="group-hover:border-sage group-hover:bg-sage/25 absolute top-1 -left-6 h-3.5 w-3.5 rounded-full border border-white/20 bg-[#111] transition-colors" />
                   <div className="flex flex-col">
-                    <span className="text-[12px] font-mono text-gray-500 mb-0.5">{item.step}</span>
-                    <span className="text-sm font-semibold text-gray-200 group-hover:text-white transition-colors">{item.title}</span>
-                    <span className="text-[12px] text-gray-400 font-mono">{item.desc}</span>
+                    <span className="mb-0.5 font-mono text-[12px] text-gray-500">{item.step}</span>
+                    <span className="text-sm font-semibold text-gray-200 transition-colors group-hover:text-white">
+                      {item.title}
+                    </span>
+                    <span className="font-mono text-[12px] text-gray-400">{item.desc}</span>
                   </div>
                 </div>
               ))}
@@ -123,22 +128,22 @@ const DevSidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-3">
-              <Radio className="w-4 h-4 text-blue-300" /> Future protocol
+            <h3 className="mb-4 flex items-center gap-3 text-sm font-semibold text-white">
+              <Radio className="h-4 w-4 text-blue-300" /> Future protocol
             </h3>
 
             <div className="space-y-3">
               {FUTURE_PLANS.map((plan) => (
                 <div
                   key={plan.id}
-                  className="p-3 rounded-md border border-white/6 bg-white/3 hover:bg-white/6 transition-colors flex items-center gap-3"
+                  className="flex items-center gap-3 rounded-md border border-white/6 bg-white/3 p-3 transition-colors hover:bg-white/6"
                 >
-                  <div className="p-2 rounded bg-black border border-white/8 text-gray-300">
-                    <plan.icon className="w-4 h-4" />
+                  <div className="rounded border border-white/8 bg-black p-2 text-gray-300">
+                    <plan.icon className="h-4 w-4" />
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-gray-200">{plan.title}</div>
-                    <div className="text-[12px] text-gray-400 font-mono">{plan.desc}</div>
+                    <div className="font-mono text-[12px] text-gray-400">{plan.desc}</div>
                   </div>
                 </div>
               ))}
@@ -146,8 +151,8 @@ const DevSidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
           </div>
         </div>
 
-        <div className="p-4 border-t border-white/6">
-          <div className="text-[12px] text-gray-400 font-mono text-center">v2.0.4 • beta</div>
+        <div className="border-t border-white/6 p-4">
+          <div className="text-center font-mono text-[12px] text-sage">{VERSION} • {VERSION_TYPE}</div>
         </div>
       </div>
     </aside>
@@ -164,21 +169,21 @@ const ConsoleHeader: React.FC<{
 }> = ({ mode, setMode, theme, toggleSidebar, isSidebarOpen }) => {
   const Icon = theme.icon;
   return (
-    <header className="flex h-12 items-center justify-between border-b border-white/6 bg-[#070707] px-4 shrink-0 transition-colors duration-200">
+    <header className="flex h-12 shrink-0 items-center justify-between border-b border-white/6 bg-[#070707] px-4 transition-colors duration-200">
       <div className="flex items-center gap-3">
         <button
           aria-label="Toggle sidebar"
           onClick={toggleSidebar}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-gray-400 transition-colors hover:text-white"
         >
-          {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
+          {isSidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
         </button>
 
-        <div className="h-5 w-px bg-white/8 mx-1" />
+        <div className="mx-1 h-5 w-px bg-white/8" />
 
         <Icon className={`${theme.accentClass} h-5 w-5`} />
-        <span className="font-mono text-sm font-semibold tracking-wide text-white uppercase hidden md:inline-block">
-          Console <span className="text-gray-600 mx-1">/</span> <span className={`${theme.accentClass}`}>{mode}</span>
+        <span className="hidden font-mono text-sm font-semibold tracking-wide text-white uppercase md:inline-block">
+          Console <span className="mx-1 text-gray-600">/</span> <span className={`${theme.accentClass}`}>{mode}</span>
         </span>
       </div>
 
@@ -198,9 +203,9 @@ const ConsoleHeader: React.FC<{
           ))}
         </div>
 
-        <div className="hidden md:flex gap-2">
-          <div className="w-2 h-2 rounded-full bg-red-500/25" />
-          <div className="w-2 h-2 rounded-full bg-white/10" />
+        <div className="hidden gap-2 md:flex">
+          <div className="h-2 w-2 rounded-full bg-red-500/25" />
+          <div className="h-2 w-2 rounded-full bg-white/10" />
         </div>
       </div>
     </header>
@@ -216,7 +221,9 @@ export default function TypeZeroConsole(): JSX.Element {
 
   // sidebar: start closed on small, allow open on desktop (user requested)
   const isMobile = useIsMobile();
-  const [isSidebarOpen, setSidebarOpen] = useState<boolean>(() => (typeof window !== 'undefined' ? window.innerWidth >= 1024 : true));
+  const [isSidebarOpen, setSidebarOpen] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+  );
 
   // Mobile tabbed panels
   const [activePanel, setActivePanel] = useState<Panel>('input');
@@ -244,7 +251,9 @@ export default function TypeZeroConsole(): JSX.Element {
     try {
       const parsed = JSON.parse(debouncedInput);
       // compute a small friendly stat: top-level keys (if object)
-      setTopLevelCount(parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? Object.keys(parsed).length : null);
+      setTopLevelCount(
+        parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? Object.keys(parsed).length : null
+      );
 
       // run engine; protect against engine exceptions
       try {
@@ -261,11 +270,7 @@ export default function TypeZeroConsole(): JSX.Element {
       setError('Invalid JSON');
       // animate shake on invalid parse
       if (inputRef.current) {
-        gsap.fromTo(
-          inputRef.current,
-          { x: -6 },
-          { x: 6, duration: 0.08, repeat: 3, yoyo: true, clearProps: 'x' }
-        );
+        gsap.fromTo(inputRef.current, { x: -6 }, { x: 6, duration: 0.08, repeat: 3, yoyo: true, clearProps: 'x' });
       }
     }
   }, [debouncedInput, engine]);
@@ -304,7 +309,11 @@ export default function TypeZeroConsole(): JSX.Element {
       setError(null);
       // small highlight animation
       if (inputRef.current) {
-        gsap.fromTo(inputRef.current, { backgroundColor: '#0b0b0b' }, { backgroundColor: '#080808', duration: 0.22, clearProps: 'backgroundColor' });
+        gsap.fromTo(
+          inputRef.current,
+          { backgroundColor: '#0b0b0b' },
+          { backgroundColor: '#080808', duration: 0.22, clearProps: 'backgroundColor' }
+        );
       }
     } catch (e) {
       setError('Invalid JSON syntax');
@@ -318,8 +327,8 @@ export default function TypeZeroConsole(): JSX.Element {
   const statusNode = useMemo(() => {
     if (error) {
       return (
-        <span className="text-red-400 font-semibold inline-flex items-center gap-2">
-          <AlertCircle className="w-4 h-4" /> INVALID JSON
+        <span className="inline-flex items-center gap-2 font-semibold text-red-400">
+          <AlertCircle className="h-4 w-4" /> INVALID JSON
         </span>
       );
     }
@@ -327,20 +336,23 @@ export default function TypeZeroConsole(): JSX.Element {
       return <span className="text-gray-400">EMPTY</span>;
     }
     return (
-      <span className="text-emerald-400 font-semibold inline-flex items-center gap-2">
-        <CheckCircle2 className="w-4 h-4" /> VALID JSON
+      <span className="inline-flex items-center gap-2 font-semibold text-emerald-400">
+        <CheckCircle2 className="h-4 w-4" /> VALID JSON
       </span>
     );
   }, [error, debouncedInput]);
 
   return (
-    <div className="flex h-[calc(100vh-100px)] relative overflow-hidden rounded-xl border border-white/6 bg-[#050507]">
+    <div className="relative flex h-[calc(100vh-100px)] overflow-hidden rounded-xl border border-white/6 bg-[#050507]">
       {/* Sidebar */}
       <DevSidebar isOpen={isSidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Mobile overlay */}
       {isSidebarOpen && isMobile && (
-        <div onClick={() => setSidebarOpen(false)} className="md:hidden absolute inset-0 bg-black/70 z-30 backdrop-blur-sm" />
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="absolute inset-0 z-30 bg-black/70 backdrop-blur-sm md:hidden"
+        />
       )}
 
       <main ref={consoleRef} className={`relative flex flex-1 flex-col bg-[#070708] transition-all duration-200`}>
@@ -358,16 +370,16 @@ export default function TypeZeroConsole(): JSX.Element {
 
         {/* Mobile tabs */}
         {isMobile && (
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-white/6 bg-[#050506]">
+          <div className="flex items-center gap-2 border-b border-white/6 bg-[#050506] px-3 py-2">
             <button
               onClick={() => setActivePanel('input')}
-              className={`flex-1 py-2 rounded-md text-sm font-semibold ${activePanel === 'input' ? 'bg-white/6 text-white' : 'text-gray-400'}`}
+              className={`flex-1 rounded-md py-2 text-sm font-semibold ${activePanel === 'input' ? 'bg-white/6 text-white' : 'text-gray-400'}`}
             >
               INPUT
             </button>
             <button
               onClick={() => setActivePanel('output')}
-              className={`flex-1 py-2 rounded-md text-sm font-semibold ${activePanel === 'output' ? 'bg-white/6 text-white' : 'text-gray-400'}`}
+              className={`flex-1 rounded-md py-2 text-sm font-semibold ${activePanel === 'output' ? 'bg-white/6 text-white' : 'text-gray-400'}`}
             >
               OUTPUT
             </button>
@@ -375,10 +387,10 @@ export default function TypeZeroConsole(): JSX.Element {
         )}
 
         {/* Editors area */}
-        <div className="grid flex-1 grid-cols-1 md:grid-cols-2 min-h-0">
+        <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-2">
           {/* Input pane */}
-          {( !isMobile || activePanel === 'input' ) && (
-            <div ref={inputRef} className="h-full border-r border-white/6 overflow-hidden bg-[#0b0b0c]">
+          {(!isMobile || activePanel === 'input') && (
+            <div ref={inputRef} className="h-full overflow-hidden border-r border-white/6 bg-[#0b0b0c]">
               <CodeWindow
                 title="INPUT.JSON"
                 code={input}
@@ -393,7 +405,7 @@ export default function TypeZeroConsole(): JSX.Element {
           )}
 
           {/* Output pane */}
-          {( !isMobile || activePanel === 'output' ) && (
+          {(!isMobile || activePanel === 'output') && (
             <div className="h-full overflow-auto bg-[#070708]">
               <div className="h-full">
                 <CodeWindow
@@ -410,26 +422,25 @@ export default function TypeZeroConsole(): JSX.Element {
         </div>
 
         {/* Status Bar */}
-        <footer className="flex h-10 items-center justify-between border-t border-white/6 bg-[#060607] px-4 text-[13px] text-gray-300 shrink-0">
+        <footer className="flex h-10 shrink-0 items-center justify-between border-t border-white/6 bg-[#060607] px-4 text-[13px] text-gray-300">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3">
               <span className="font-mono text-xs text-gray-400">STATUS</span>
               {statusNode}
             </div>
 
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden items-center gap-3 sm:flex">
               <span className="font-mono text-xs text-gray-400">INFO</span>
-              <span className="text-sm">
-                {topLevelCount !== null ? `${topLevelCount} top-level keys` : '—'}
-              </span>
+              <span className="text-sm">{topLevelCount !== null ? `${topLevelCount} top-level keys` : '—'}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="text-sm font-semibold">
-              <span className={`${theme.accentClass}`}>{mode}</span> • <span className="text-gray-400">{MODE_THEME[mode].label}</span>
+              <span className={`${theme.accentClass}`}>{mode}</span> •{' '}
+              <span className="text-gray-400">{MODE_THEME[mode].label}</span>
             </div>
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="hidden items-center gap-2 sm:flex">
               <button
                 onClick={() => {
                   try {
@@ -440,11 +451,15 @@ export default function TypeZeroConsole(): JSX.Element {
                   } catch {
                     setError('Invalid JSON syntax');
                     if (inputRef.current) {
-                      gsap.fromTo(inputRef.current, { x: -6 }, { x: 6, duration: 0.08, repeat: 3, yoyo: true, clearProps: 'x' });
+                      gsap.fromTo(
+                        inputRef.current,
+                        { x: -6 },
+                        { x: 6, duration: 0.08, repeat: 3, yoyo: true, clearProps: 'x' }
+                      );
                     }
                   }
                 }}
-                className="px-3 py-1 rounded-md bg-white/6 text-white text-sm font-medium"
+                className="rounded-md bg-white/6 px-3 py-1 text-sm font-medium text-white"
                 aria-label="Prettify JSON"
               >
                 Prettify

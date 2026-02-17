@@ -10,6 +10,7 @@ import CTA from "@/components/landing/CTA";
 import LavaLamp from "@/components/layout/LavaLamp";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
+import {VERSION, VERSION_TYPE} from '@/lib/constants'
 
 export default function Landing() {
   const [showLogin, setShowLogin] = useState(false);
@@ -36,7 +37,7 @@ export default function Landing() {
           
           <div className="mb-8 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 hero-text backdrop-blur-md">
               <span className="w-1.5 h-1.5 rounded-full bg-sage animate-pulse"/>
-              <span className="text-[11px] font-mono tracking-widest text-gray-300 uppercase">v0.0 Beta Live</span>
+              <span className="text-[11px] font-mono tracking-widest text-gray-300 uppercase">{VERSION} {VERSION_TYPE} Live</span>
           </div>
 
           <h1 className="hero-text text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-6">

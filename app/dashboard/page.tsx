@@ -12,7 +12,7 @@ export default async function Dashboard() {
     <div className="min-h-screen bg-[#020202] text-white overflow-hidden">
       
       {/* Dashboard Nav */}
-      <nav className="h-16 mx-10 border-b border-white/5 flex items-center justify-between px-6 bg-obsidian">
+      <nav className="h-16  border-b border-white/5 flex items-center justify-between px-10 bg-obsidian">
         <div className="flex items-center gap-3">
              <div className="w-8 h-8 bg-sage rounded-sm flex items-center justify-center text-black font-black text-xs shadow-[0_0_10px_-2px_rgba(212,255,0,0.5)]">T0</div>
              <span className="font-bold tracking-tight text-lg">Console</span>
@@ -22,11 +22,11 @@ export default async function Dashboard() {
         <div className="relative group z-50">
            <button className="flex items-center gap-3 pl-4 border-l border-white/10 outline-none">
               <div className="text-right hidden md:block">
-                 <div className="text-xs font-bold text-white">{session.user?.name}</div>
+                 <div className="text-sm font-bold text-white">{session.user?.name}</div>
                  
               </div>
               {session.user?.image ? (
-                 <Image src={session.user.image} alt="Profile" width={32} height={32} className="rounded-full border border-white/20" />
+                 <Image src={session.user.image} alt="Profile" width={40} height={40} className="rounded-full border border-white/20" />
               ) : (
                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><User className="w-4 h-4"/></div>
               )}
@@ -49,7 +49,7 @@ export default async function Dashboard() {
       </nav>
 
       {/* The Console Area */}
-      <div className="p-5">
+      <div className="py-1 px-10">
          <TypeZeroConsole /> 
       </div>
     </div>
