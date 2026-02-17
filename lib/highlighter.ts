@@ -8,95 +8,79 @@ const escapeHtml = (s: string) =>
 const span = (cls: string, text: string) =>
   `<span class="${cls}">${text}</span>`;
 
-/*
-  Tuned VS Code Dark+ palette.
-  We intentionally boost contrast vs your background.
-*/
 const COLORS = {
-  key: "text-[#9cdcfe]",          // object keys / fields
+  key: "text-[#9cdcfe]",
   string: "text-[#ce9178]",
   number: "text-[#b5cea8]",
   keyword: "text-[#c586c0]",
   type: "text-[#4ec9b0]",
   func: "text-[#dcdcaa]",
-  boolean: "text-[#569cd6]",
-  punctuation: "text-[#808080]"
+  boolean: "text-[#569cd6]"
 };
 
+/**
+ * IMPORTANT:
+ * We highlight line-by-line and never re-process injected HTML.
+ */
 export const highlightCode = (code: string, lang: Lang): string => {
   if (!code) return "";
 
-  let html = escapeHtml(code);
+  const lines = code.split("\n");
 
-  /* ---------- JSON ---------- */
-  if (lang === "json") {
-    return html.replace(
-      /("(?:\\.|[^"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
-      (match, str, colon, bool) => {
-        if (colon) return span(COLORS.key, match);
-        if (bool) return span(COLORS.boolean, match);
-        if (/^-?\d/.test(match)) return span(COLORS.number, match);
-        return span(COLORS.string, match);
-      }
-    );
-  }
+  const highlightLine = (line: string): string => {
+    let text = escapeHtml(line);
 
-  /* ---------- TYPESCRIPT ---------- */
-  if (lang === "ts") {
-    html = html
-      .replace(/\b(export|interface|type|extends|readonly)\b/g, span(COLORS.keyword, "$1"))
-      .replace(/\b(string|number|boolean|null|any)\b/g, span(COLORS.keyword, "$1"))
-      .replace(/(interface\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`)
-      .replace(/(\w+)(:)/g, `${span(COLORS.key, "$1")}$2`)
-      .replace(/\b([A-Z][A-Za-z0-9_]+)\b/g, span(COLORS.type, "$1")); // types
+    /* ---------- JSON ---------- */
+    if (lang === "json") {
+      return text.replace(
+        /("(?:\\.|[^"])*")(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?/g,
+        (match, _, colon, bool) => {
+          if (colon) return span(COLORS.key, match);
+          if (bool) return span(COLORS.boolean, match);
+          if (/^-?\d/.test(match)) return span(COLORS.number, match);
+          return span(COLORS.string, match);
+        }
+      );
+    }
 
-    return html;
-  }
+    /* ---------- TS ---------- */
+    if (lang === "ts") {
+      text = text.replace(/\b(export|interface|type|extends|readonly)\b/g, span(COLORS.keyword, "$1"));
+      text = text.replace(/\b(string|number|boolean|null|any)\b/g, span(COLORS.keyword, "$1"));
+      text = text.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g, span(COLORS.type, "$1"));
+      text = text.replace(/(\w+)(:)/g, `${span(COLORS.key, "$1")}$2`);
+      return text;
+    }
 
-  /* ---------- SQL ---------- */
-  if (lang === "sql") {
-    html = html
-      .replace(
-        /\b(CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|PRECISION|SERIAL|NOT|NULL|JSONB|SELECT|FROM|WHERE)\b/gi,
+    /* ---------- SQL ---------- */
+    if (lang === "sql") {
+      text = text.replace(
+        /\b(CREATE|TABLE|PRIMARY|KEY|BOOLEAN|TEXT|DOUBLE|PRECISION|SERIAL|NOT|NULL|JSONB)\b/gi,
         span(COLORS.keyword, "$1")
-      )
-      .replace(/\b([a-z_][a-z0-9_]*)\b(?=\s+\()/gi, span(COLORS.func, "$1")) // functions
-      .replace(/"[^"]+"/g, span(COLORS.string, "$&"));
+      );
 
-    return html;
-  }
+      text = text.replace(/"[^"]+"/g, span(COLORS.string, "$&"));
 
-  /* ---------- PYTHON / PYDANTIC ---------- */
-  if (lang === "py") {
-    html = html
-      // imports / keywords
-      .replace(/\b(class|from|import|as|return|pass)\b/g, span(COLORS.keyword, "$1"))
+      text = text.replace(/\b\d+\b/g, span(COLORS.number, "$&"));
 
-      // typing constructs
-      .replace(/\b(List|Optional|Dict|Any|Union)\b/g, span(COLORS.type, "$1"))
+      return text;
+    }
 
-      // BaseModel / Field / validator / etc
-      .replace(/\b(BaseModel|Field|validator)\b/g, span(COLORS.type, "$1"))
+    /* ---------- PYDANTIC ---------- */
+    if (lang === "py") {
+      text = text.replace(/\b(class|from|import|pass)\b/g, span(COLORS.keyword, "$1"));
+      text = text.replace(/\b(BaseModel|Field|List|Optional|Any)\b/g, span(COLORS.type, "$1"));
+      text = text.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g, span(COLORS.type, "$1"));
+      text = text.replace(/^(\s*)([a-z_][a-z0-9_]*)(:)/i,
+        (_, ws, name, colon) => `${ws}${span(COLORS.key, name)}${colon}`
+      );
+      text = text.replace(/"[^"]*"|'[^']*'/g, span(COLORS.string, "$&"));
+      text = text.replace(/\b\d+\b/g, span(COLORS.number, "$&"));
+      return text;
+    }
 
-      // class names
-      .replace(/(class\s+)([A-Z]\w*)/g, `$1${span(COLORS.type, "$2")}`)
+    return text;
+  };
 
-      // function calls
-      .replace(/\b([a-z_][a-z0-9_]*)\(/gi, `${span(COLORS.func, "$1")}(`)
-
-      // field names
-      .replace(/^\s*([a-z_][a-z0-9_]*)\s*:/gim, (_, name) =>
-        `    ${span(COLORS.key, name)}:`
-      )
-
-      // strings
-      .replace(/"[^"]*"|'[^']*'/g, span(COLORS.string, "$&"))
-
-      // numbers
-      .replace(/\b\d+(\.\d+)?\b/g, span(COLORS.number, "$&"));
-
-    return html;
-  }
-
-  return html;
+  return lines.map(highlightLine).join("\n");
 };
