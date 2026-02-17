@@ -48,13 +48,9 @@ export default function DemoSection() {
         {/* Header Bar */}
         <div className="flex items-center justify-between px-4 py-3 bg-[#111] border-b border-white/5">
           <div className="flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500/20" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
-              <div className="w-3 h-3 rounded-full bg-green-500/20" />
-            </div>
-            <div className="ml-4 px-3 py-1 bg-black rounded-md border border-white/5 text-[10px] text-gray-500 font-mono flex items-center gap-2">
-              <span className="text-sage">🔒</span> typezero.app/engine
+            
+            <div className="ml-2 px-3 py-1 bg-black rounded-md border border-white/5  text-gray-400 ">
+              <span >🔒</span> <span className="text-sage font-mono text-xs">typezero.app/engine</span>
             </div>
           </div>
 
