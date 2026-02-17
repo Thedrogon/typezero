@@ -128,7 +128,7 @@ export default function TypeZeroConsole() {
                 key={m}
                 onClick={() => setMode(m)}
                 className={`rounded-sm px-3 py-1 text-[9px] font-bold tracking-widest transition-all ${
-                  mode === m ? `bg-white/10 text-white ${THEMES[m].color}` : 'text-gray-600 hover:text-gray-400'
+                  mode === m ? `bg-white/10 text-white ${THEMES[m].color}` : 'text-gray-300 hover:text-gray-400'
                 }`}
               >
                 {m}

@@ -52,12 +52,12 @@ export default function CodeWindow({ title, code, onChange, readOnly, variant, m
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-white/5 select-none shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex gap-1.5 opacity-40">
+          <div className="flex gap-1.5 opacity-60">
             <div className="w-2.5 h-2.5 rounded-full bg-[#ff5656]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
             <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
           </div>
-          <span className={`ml-2 text-[10px] font-bold tracking-widest uppercase ${textColor} font-mono opacity-80`}>
+          <span className={`ml-2 text-[10px] font-bold tracking-widest uppercase text-sage font-mono`}>
             {title}
           </span>
         </div>
