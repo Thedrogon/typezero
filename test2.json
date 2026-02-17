@@ -1,0 +1,260 @@
+{
+  "system": {
+    "name": "OrionOps",
+    "environment": "staging",
+    "region": "ap-south-1",
+    "time": {
+      "iso": "2026-02-17T11:02:44.123Z",
+      "epoch": 1739780564,
+      "timezone": "Asia/Kolkata"
+    },
+    "featureMatrix": {
+      "authV2": true,
+      "vectorSearch": true,
+      "legacyMode": false,
+      "rollouts": [
+        { "feature": "semantic-cache", "percentage": 35.5 },
+        { "feature": "async-indexer", "percentage": 72.1 }
+      ]
+    }
+  },
+
+  "identity": {
+    "users": [
+      {
+        "id": "u-1001",
+        "username": "sayanjit",
+        "status": "active",
+        "createdAt": "2025-11-03T08:11:00Z",
+        "profile": {
+          "fullName": "Sayanjit Mukherjee",
+          "dob": null,
+          "languages": ["en", "bn", "hi"],
+          "addresses": [
+            {
+              "type": "home",
+              "line1": "Street 42",
+              "city": "Asansol",
+              "state": "WB",
+              "postal": "713301",
+              "geo": { "lat": 23.6739, "lng": 86.9524 }
+            }
+          ]
+        },
+        "roles": ["admin", "builder"],
+        "security": {
+          "mfa": { "enabled": true, "methods": ["totp"] },
+          "lastPasswordChange": "2026-01-02T10:00:00Z",
+          "sessions": [
+            {
+              "sessionId": "sess-a1",
+              "ip": "10.0.0.14",
+              "device": "Chrome/Windows",
+              "started": "2026-02-17T09:00:00Z",
+              "riskScore": 0.12
+            },
+            {
+              "sessionId": "sess-a2",
+              "ip": "10.0.0.22",
+              "device": "Edge/Windows",
+              "started": "2026-02-16T18:42:10Z",
+              "riskScore": 0.08
+            }
+          ]
+        }
+      },
+
+      {
+        "id": "u-1002",
+        "username": "ops.bot",
+        "status": "service",
+        "createdAt": "2025-06-10T00:00:00Z",
+        "profile": {
+          "fullName": "Operations Bot",
+          "languages": [],
+          "addresses": []
+        },
+        "roles": ["automation"],
+        "security": {
+          "mfa": { "enabled": false, "methods": [] },
+          "apiKeys": [
+            {
+              "keyId": "key-x91",
+              "scopes": ["deploy", "metrics.write"],
+              "created": "2025-12-01T00:00:00Z",
+              "expires": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "projects": [
+    {
+      "projectId": "proj-rag-core",
+      "name": "RAG Core Engine",
+      "owners": ["u-1001"],
+      "repositories": [
+        {
+          "repoId": "repo-77",
+          "provider": "github",
+          "url": "https://example.org/repo.git",
+          "branches": [
+            {
+              "name": "main",
+              "protected": true,
+              "checks": {
+                "required": ["build", "lint", "security-scan"],
+                "history": [
+                  { "run": 1841, "status": "passed", "durationSec": 312 },
+                  { "run": 1842, "status": "passed", "durationSec": 295 },
+                  { "run": 1843, "status": "failed", "durationSec": 401 }
+                ]
+              }
+            },
+            {
+              "name": "dev",
+              "protected": false,
+              "checks": { "required": [], "history": [] }
+            }
+          ]
+        }
+      ],
+
+      "pipelines": [
+        {
+          "pipelineId": "pipe-index",
+          "description": "Document ingestion + embedding",
+          "steps": [
+            {
+              "name": "extract",
+              "config": {
+                "formats": ["pdf", "html", "md"],
+                "ocr": { "enabled": true, "languageHints": ["eng", "ben"] }
+              }
+            },
+            {
+              "name": "chunk",
+              "config": {
+                "strategy": "semantic",
+                "targetTokens": 420,
+                "hardLimit": 512
+              }
+            },
+            {
+              "name": "embed",
+              "config": {
+                "model": "local-e5",
+                "dimension": 1536,
+                "batchSize": 32
+              }
+            }
+          ],
+          "metrics": {
+            "last24h": {
+              "documents": 1822,
+              "avgLatencyMs": 84.22,
+              "p95LatencyMs": 131.9,
+              "failures": 7
+            }
+          }
+        }
+      ]
+    }
+  ],
+
+  "infrastructure": {
+    "clusters": [
+      {
+        "clusterId": "k8s-a",
+        "version": "1.29",
+        "nodes": [
+          {
+            "nodeId": "node-01",
+            "instanceType": "c6i.2xlarge",
+            "capacity": { "cpu": 8, "memoryGb": 16 },
+            "allocations": {
+              "cpuUsed": 5.4,
+              "memoryUsedGb": 11.2,
+              "pods": [
+                { "name": "api-7f9c", "ns": "core", "restarts": 0 },
+                { "name": "indexer-22aa", "ns": "ai", "restarts": 2 }
+              ]
+            }
+          },
+          {
+            "nodeId": "node-02",
+            "instanceType": "r6i.xlarge",
+            "capacity": { "cpu": 4, "memoryGb": 32 },
+            "allocations": {
+              "cpuUsed": 2.1,
+              "memoryUsedGb": 21.7,
+              "pods": [
+                { "name": "vectordb", "ns": "ai", "restarts": 0 }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+
+  "observability": {
+    "logs": [
+      {
+        "ts": "2026-02-17T10:59:01.001Z",
+        "level": "INFO",
+        "service": "api",
+        "message": "Request completed",
+        "context": {
+          "path": "/v1/query",
+          "durationMs": 42,
+          "traceId": "trc-991aa"
+        }
+      },
+      {
+        "ts": "2026-02-17T10:59:02.334Z",
+        "level": "WARN",
+        "service": "indexer",
+        "message": "Vector drift detected",
+        "context": {
+          "docId": "doc-771",
+          "cosineDelta": 0.0831
+        }
+      }
+    ],
+
+    "timeSeries": {
+      "cpuLoad": [
+        { "t": "10:00", "v": 0.44 },
+        { "t": "10:05", "v": 0.51 },
+        { "t": "10:10", "v": 0.48 },
+        { "t": "10:15", "v": 0.63 }
+      ],
+      "queryQps": [
+        { "t": "10:00", "v": 122 },
+        { "t": "10:05", "v": 141 },
+        { "t": "10:10", "v": 137 },
+        { "t": "10:15", "v": 166 }
+      ]
+    }
+  },
+
+  "edgeCases": {
+    "unicode": "বাংলাテキスト🌌",
+    "escaped": "Quotes: \"yes\" Backslash: \\ Path: C:\\temp\\file",
+    "veryPrecise": 0.12345678901234568,
+    "stringifiedJson": "{\"nested\":\"but still string\"}",
+    "heterogeneousArray": [
+      1,
+      "two",
+      { "three": 3 },
+      [4, 5, { "six": 6 }]
+    ],
+    "similarButDifferent": [
+      { "id": "x1", "value": 10, "flag": true },
+      { "id": "x1", "value": "10", "flag": "true" }
+    ]
+  }
+}

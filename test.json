@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "requestId": "9f1c2a7e-6c4d-4d9e-91a3-b2f1d5c8e777",
+    "generatedAt": "2026-02-17T10:14:22.481Z",
+    "locale": "en-IN",
+    "debug": true,
+    "version": {
+      "api": "v3.12.0",
+      "schema": 7,
+      "deprecated": null
+    }
+  },
+  "user": {
+    "id": 8844221,
+    "profile": {
+      "name": {
+        "first": "Sayanjit",
+        "middle": null,
+        "last": "Mukherjee",
+        "display": "Sayanjit M."
+      },
+      "emails": [
+        { "type": "primary", "value": "user@example.com", "verified": true },
+        { "type": "recovery", "value": "backup@example.com", "verified": false }
+      ],
+      "phones": [],
+      "preferences": {
+        "theme": "dark",
+        "language": "en",
+        "experimentalFlags": {
+          "ragPipeline": true,
+          "ai_autofill": false,
+          "⚠-unstable-feature": {
+            "enabled": true,
+            "rollout": 0.27
+          }
+        }
+      }
+    },
+    "roles": ["admin", "developer", "beta-tester"],
+    "lastLogin": 1739779200
+  },
+  "organizations": [
+    {
+      "orgId": "org_001",
+      "name": "NebulaWorks",
+      "active": true,
+      "teams": [
+        {
+          "teamId": "eng-platform",
+          "members": [
+            { "userId": 8844221, "permissions": ["read", "write", "deploy"] },
+            { "userId": 8844555, "permissions": ["read"] }
+          ],
+          "services": [
+            {
+              "serviceId": "auth-svc",
+              "status": "healthy",
+              "uptime": "99.982%",
+              "regions": [
+                {
+                  "name": "ap-south-1",
+                  "instances": [
+                    {
+                      "id": "i-0aa12",
+                      "metrics": {
+                        "cpu": [12, 18, 44, 67, 23],
+                        "memory": {
+                          "usedMb": 7421,
+                          "freeMb": 1580,
+                          "history": [
+                            { "t": "10:00", "v": 7021 },
+                            { "t": "10:05", "v": 7310 }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "projectId": "rag-lab",
+      "tags": ["llm", "vector-db", "infra"],
+      "settings": {
+        "embedding": {
+          "provider": "local",
+          "dimension": 1536,
+          "quantization": {
+            "enabled": true,
+            "type": "int8",
+            "fallback": {
+              "enabled": true,
+              "reason": "accuracy_threshold",
+              "threshold": 0.92
+            }
+          }
+        },
+        "chunking": {
+          "strategy": "semantic",
+          "maxTokens": 512,
+          "overlap": 64
+        }
+      },
+      "documents": [
+        {
+          "docId": "whitepaper-α",
+          "title": "Multilingual Retrieval — 検索 / অনুসন্ধান",
+          "versions": [
+            {
+              "v": 1,
+              "checksum": "sha256:ab98f1...",
+              "createdAt": "2025-12-01T09:00:00Z",
+              "stats": {
+                "tokens": 18221,
+                "sections": 14,
+                "tables": 3
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auditTrail": [
+    {
+      "eventId": "evt-7781",
+      "actor": { "type": "user", "id": 8844221 },
+      "action": "DEPLOY_TRIGGERED",
+      "context": {
+        "ip": "127.0.0.1",
+        "userAgent": "Mozilla/5.0",
+        "diff": {
+          "before": { "replicas": 2 },
+          "after": { "replicas": 4 }
+        }
+      }
+    }
+  ],
+  "edgeCases": {
+    "emptyObject": {},
+    "emptyArray": [],
+    "nullValue": null,
+    "booleanMatrix": [[true, false], [false, true]],
+    "numbers": {
+      "bigIntLike": "9223372036854775807",
+      "floatPrecision": 0.30000000000000004,
+      "negativeZero": -0
+    },
+    "weirdKeys": {
+      "key with spaces": "value",
+      "key.with.dots": "value",
+      "key/with/slash": "value"
+    },
+    "longText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
+  }
+}
